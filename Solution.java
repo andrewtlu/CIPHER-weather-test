@@ -11,7 +11,7 @@ public class Solution {
      * @param date date to process
      */
     public void daylightTemp(String path, String date) {
-        
+
     }
 
     /** TODO: Implement
@@ -36,5 +36,26 @@ public class Solution {
      */
     public void similarDay(String path1, String path2) {
 
+    }
+
+    /**
+     * Converts MM/dd/yyyy to yyyy-MM-dd and vice-versa
+     * 
+     * @param date date to convert
+     * @return converted date
+     */
+    public String convert(String date) {
+        String[] sSplit = date.split("-|/");
+        int[] split = new int[3];
+        
+        for (int i = 0; i < sSplit.length; i++)
+            split[i] = Integer.parseInt(sSplit[i]);
+
+        if (date.contains("/")) { // convert to yyyy-MM-dd
+            return String.format("%04d-%02d-%02d", split[2], split[0], split[1]);
+        }
+
+        // convert to MM/dd/yyyy
+        return String.format("%d/%d/%d", split[1], split[2], split[0]);
     }
 }
