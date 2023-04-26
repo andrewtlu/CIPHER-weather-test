@@ -32,6 +32,8 @@ public class Solution {
                 if (time < sunrise) continue;
                 else if (time > sunset) break;
                 else {
+                    if (data[10].isEmpty()) continue;
+
                     temp = Double.parseDouble(data[10].replaceAll("s", "")); // remove suspect marker
                     avg += temp;
                     temps.add(temp);
@@ -58,7 +60,35 @@ public class Solution {
      * @param date date to process
      */
     public void windchills(String path, String date) {
-
+        String line;
+        String[] data;
+        date = convert(date);
+    
+        try (BufferedReader reader = new BufferedReader(new FileReader(path));) {
+            // while ((line = reader.readLine()) != null) {
+            //     data = line.split(",");
+            //     if (!data[5].contains(date)) continue;
+                
+            //     // date found
+                
+            //     if (time < sunrise) continue;
+            //     else if (time > sunset) break;
+            //     else {
+            //         temp = Double.parseDouble(data[10].replaceAll("s", "")); // remove suspect marker
+            //         avg += temp;
+            //         temps.add(temp);
+            //     }
+            // }
+            
+            // // calculate sample standard deviation -> sqrt(sum/(sample size - 1))
+            // avg /= temps.size();
+            // double sum = 0;
+            // for (Double i : temps)
+            //     sum += Math.pow(i - avg, 2);
+            
+            // System.out.println(avg);
+            // System.out.println(Math.sqrt(sum/(temps.size() - 1)));
+        } catch (Exception ex) { ex.printStackTrace(); }
     }
 
     /** TODO: Implement
