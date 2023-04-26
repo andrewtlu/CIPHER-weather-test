@@ -15,8 +15,8 @@ public class Solution {
     public void daylightTemp(String path, String date) {
         String line;
         String[] data;
-        int sunrise = -1, sunset = -1, time;
-        double avg = 0, temp;
+        int sunrise = -1, sunset = -1, time, temp;
+        double avg = 0;
         List<Double> temps = new ArrayList<>();
         date = convert(date);
     
@@ -34,9 +34,9 @@ public class Solution {
                 else {
                     if (data[10].isEmpty()) continue;
 
-                    temp = Double.parseDouble(data[10].replaceAll("s", "")); // remove suspect marker
+                    temp = temp(data[10]);
                     avg += temp;
-                    temps.add(temp);
+                    temps.add((double)temp);
                 }
             }
             
@@ -51,10 +51,10 @@ public class Solution {
         } catch (Exception ex) { ex.printStackTrace(); }
     }
 
-    /** TODO: Implement
+    /**
      * Method 2
      * <p>
-     * Prints all windchills of date when temperature is < 40 deg F
+     * Prints all windchills of date when temperature is <= 40 deg F
      * 
      * @param path path of csv data set
      * @param date date to process
@@ -62,32 +62,24 @@ public class Solution {
     public void windchills(String path, String date) {
         String line;
         String[] data;
+        boolean reached = false;
+        int temp;
         date = convert(date);
     
         try (BufferedReader reader = new BufferedReader(new FileReader(path));) {
-            // while ((line = reader.readLine()) != null) {
-            //     data = line.split(",");
-            //     if (!data[5].contains(date)) continue;
-                
-            //     // date found
-                
-            //     if (time < sunrise) continue;
-            //     else if (time > sunset) break;
-            //     else {
-            //         temp = Double.parseDouble(data[10].replaceAll("s", "")); // remove suspect marker
-            //         avg += temp;
-            //         temps.add(temp);
-            //     }
-            // }
-            
-            // // calculate sample standard deviation -> sqrt(sum/(sample size - 1))
-            // avg /= temps.size();
-            // double sum = 0;
-            // for (Double i : temps)
-            //     sum += Math.pow(i - avg, 2);
-            
-            // System.out.println(avg);
-            // System.out.println(Math.sqrt(sum/(temps.size() - 1)));
+            while ((line = reader.readLine()) != null) {
+                data = line.split(",");
+                if (!data[5].contains(date)) {
+                    if (!reached) continue;
+                    else break; // done
+                }
+                reached = true;
+
+                if (data[10].isEmpty() || data[17].isEmpty()) continue;
+
+                temp = temp(data[10]);
+                if (temp <= 40) System.out.println(windchill(temp, Integer.parseInt(data[17])));
+            }
         } catch (Exception ex) { ex.printStackTrace(); }
     }
 
@@ -122,5 +114,26 @@ public class Solution {
 
         // convert to MM/dd/yyyy
         return String.format("%d/%d/%02d", split[1], split[2], split[0] % 100);
+    }
+
+    /**
+     * Trims and returns integer temperature
+     * 
+     * @param temp
+     * @return
+     */
+    public int temp(String temp) {
+        return Integer.parseInt(temp.replaceAll("s", "")); // remove suspect marker
+    }
+ 
+    /**
+     * Calculates windchill factor given temp and wind speed
+     * 
+     * @param temp  temperature
+     * @param speed wind speed
+     * @return windchill factor
+     */
+    public int windchill(int temp, int speed) {
+        return (int)Math.round(35.74 + 0.6215*temp - 35.75*Math.pow(speed, 0.16) + 0.4275*temp*Math.pow(speed, 0.16));
     }
 }
