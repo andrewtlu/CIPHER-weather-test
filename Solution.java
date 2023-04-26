@@ -11,7 +11,23 @@ public class Solution {
      * @param date date to process
      */
     public void daylightTemp(String path, String date) {
-
+        date = convert(date); // convert
+        String line;
+        String[] parsed;
+        int sunrise = -1;
+        int sunset = -1;
+    
+        try (BufferedReader reader = new BufferedReader(new FileReader(path));) {
+            while ((line = reader.readLine()) != null) {
+                parsed = line.split(",");
+                
+                if (!parsed[5].contains(date)) continue;
+                if (sunrise == -1) { sunrise = Integer.parseInt(parsed[35]); sunset = Integer.parseInt(parsed[36]); }
+                
+                System.out.println(sunrise + " " + sunset);
+                return;
+            }    
+        } catch (Exception ex) { ex.printStackTrace(); }
     }
 
     /** TODO: Implement
@@ -39,7 +55,7 @@ public class Solution {
     }
 
     /**
-     * Converts MM/dd/yyyy to yyyy-MM-dd and vice-versa
+     * Converts MM/dd/yy to yyyy-MM-dd and vice-versa
      * 
      * @param date date to convert
      * @return converted date
@@ -52,10 +68,10 @@ public class Solution {
             split[i] = Integer.parseInt(sSplit[i]);
 
         if (date.contains("/")) { // convert to yyyy-MM-dd
-            return String.format("%04d-%02d-%02d", split[2], split[0], split[1]);
+            return String.format("20%02d-%02d-%02d", split[2], split[0], split[1]);
         }
 
         // convert to MM/dd/yyyy
-        return String.format("%d/%d/%d", split[1], split[2], split[0]);
+        return String.format("%d/%d/%02d", split[1], split[2], split[0] % 100);
     }
 }
