@@ -1,32 +1,51 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Solution {
-    /** TODO: Implement
+    /**
      * Method 1
      * <p>
-     * Calculates and prints average and sample standard deviation of dry-bulb temperatures (F) from sunrise to sunset of specified date
+     * Calculates and prints average and sample standard deviation of dry-bulb temperatures (F) during daylight hours of specified date
      * 
      * @param path path of csv data set
      * @param date date to process
      */
     public void daylightTemp(String path, String date) {
-        date = convert(date); // convert
         String line;
-        String[] parsed;
-        int sunrise = -1;
-        int sunset = -1;
+        String[] data;
+        int sunrise = -1, sunset = -1, time;
+        double avg = 0, temp;
+        List<Double> temps = new ArrayList<>();
+        date = convert(date);
     
         try (BufferedReader reader = new BufferedReader(new FileReader(path));) {
             while ((line = reader.readLine()) != null) {
-                parsed = line.split(",");
+                data = line.split(",");
+                if (!data[5].contains(date)) continue;
                 
-                if (!parsed[5].contains(date)) continue;
-                if (sunrise == -1) { sunrise = Integer.parseInt(parsed[35]); sunset = Integer.parseInt(parsed[36]); }
+                // date found
+                if (sunrise == -1) { sunrise = Integer.parseInt(data[35]); sunset = Integer.parseInt(data[36]); }
+                time = Integer.parseInt(data[5].split(" ")[1].replaceAll(":", ""));
                 
-                System.out.println(sunrise + " " + sunset);
-                return;
-            }    
+                if (time < sunrise) continue;
+                else if (time > sunset) break;
+                else {
+                    temp = Double.parseDouble(data[10].replaceAll("s", "")); // remove suspect marker
+                    avg += temp;
+                    temps.add(temp);
+                }
+            }
+            
+            // calculate sample standard deviation -> sqrt(sum/(sample size - 1))
+            avg /= temps.size();
+            double sum = 0;
+            for (Double i : temps)
+                sum += Math.pow(i - avg, 2);
+            
+            System.out.println(avg);
+            System.out.println(Math.sqrt(sum/(temps.size() - 1)));
         } catch (Exception ex) { ex.printStackTrace(); }
     }
 
@@ -57,8 +76,8 @@ public class Solution {
     /**
      * Converts MM/dd/yy to yyyy-MM-dd and vice-versa
      * 
-     * @param date date to convert
-     * @return converted date
+     * @param date  date to convert
+     * @return      converted date
      */
     public String convert(String date) {
         String[] sSplit = date.split("-|/");
