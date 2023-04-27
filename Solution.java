@@ -99,11 +99,11 @@ public class Solution {
      */
     public void similarDay(String path1, String path2) {
         String row1 = null, row2 = null, match = null;
-        Day day;
+        Location location;
         int diff, similar = -1;
 
         // factor out
-        Day[] days = new Day[2];
+        Location[] locations = new Location[2];
         String[] rows = {row1, row2}, dates = new String[2];
         Data[] datas = new Data[2];
 
@@ -131,17 +131,17 @@ public class Solution {
 
                 // 2 load each day's entirety
                 for (int i = 0; i < 2; i++) {
-                    days[i] = new Day(dates[i]);
-                    day = days[i];
+                    locations[i] = new Location();
+                    location = locations[i];
                     
                     do {
                         datas[i] = new Data(rows[i]);
-                        day.addAll(datas[i]);
+                        location.addAll(datas[i]);
                     } while ((rows[i] = readers[i].readLine()) != null && rows[i].contains(dates[i]));
                 }
                 
                 // 3 check if more similar
-                diff = days[0].compareTo(days[1]);
+                diff = locations[0].compareTo(locations[1]);
                 if (similar == -1 || similar > diff && diff != -1) {
                     similar = diff;
                     match = dates[0];
@@ -245,18 +245,11 @@ public class Solution {
         }
     }
 
-    public static class Day implements Comparable<Day> {
+    public static class Location implements Comparable<Location> {
         int tempCount, humidityCount, speedCount;
         double temp, humidity, speed;
-        int d, m, y;
 
-        public Day(String date) {
-            int[] split = Arrays.stream(date.split("/")).mapToInt(Integer::parseInt).toArray();
-
-            this.d = split[1];
-            this.m = split[0];
-            this.y = split[2];
-
+        public Location() {
             temp = humidity = speed = 0;
             tempCount = humidityCount = speedCount = 0;
         }
@@ -294,7 +287,7 @@ public class Solution {
         }
 
         @Override
-        public int compareTo(Day other) {
+        public int compareTo(Location other) {
             double[] avg1 = this.getAvgs(), avg2 = other.getAvgs();
             if (tempCount + humidityCount + speedCount == 0) return -1; // if no data for day
             return (int)(Math.sqrt(Math.pow(avg1[0] - avg2[0], 2) + Math.pow(avg1[1] - avg2[1], 2) + Math.pow(avg1[2] - avg2[2], 2))*1000);
